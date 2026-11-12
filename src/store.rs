@@ -118,7 +118,10 @@ impl EntityStore {
 
         if let Some((lat, lon)) = o.lat.zip(o.lon) {
             let place_id = format!("place:{lat:.2},{lon:.2}");
-            let name = o.place.clone().unwrap_or_else(|| format!("{lat:.2}, {lon:.2}"));
+            let name = o
+                .place
+                .clone()
+                .unwrap_or_else(|| format!("{lat:.2}, {lon:.2}"));
             if self.upsert(
                 &place_id,
                 EntityKind::Place,
@@ -139,7 +142,14 @@ impl EntityStore {
     pub fn observe_quote(&mut self, q: &Quote) -> ExtractionStats {
         let mut stats = ExtractionStats::default();
         let id = format!("symbol:{}", q.symbol.to_uppercase());
-        if self.upsert(&id, EntityKind::Symbol, &q.symbol.to_uppercase(), "market", "venue data", q.ts_ms) {
+        if self.upsert(
+            &id,
+            EntityKind::Symbol,
+            &q.symbol.to_uppercase(),
+            "market",
+            "venue data",
+            q.ts_ms,
+        ) {
             stats.created += 1;
         }
         if let Some(entity) = self.entities.get_mut(&id) {
